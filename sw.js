@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pdf-extraktor-v4';
+const CACHE_NAME = 'pdf-pro-v1';
 const ASSETS = [
     './',
     './index.html',

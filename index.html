@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PDF Extraktor Pro</title>
+    <title>PDFpro</title>
     <link rel="icon" type="image/png" href="PDFextractor.png">
     <link rel="apple-touch-icon" href="PDFextractor.png">
     <link rel="manifest" href="manifest.json">
@@ -16,6 +16,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.5/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
     <script src="https://unpkg.com/@pdf-lib/fontkit@0.0.4/dist/fontkit.umd.min.js"></script>
+    <script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+    <script src="https://unpkg.com/imagetracerjs@1.2.6/imagetracer_v1.2.6.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -26,18 +28,24 @@
                     <img src="PDFextractor.png" alt="Logo" style="height: 40px; width: 40px; border-radius: 8px; object-fit: cover;">
                 </div>
                 <div>
-                    <h1>PDF Extraktor Pro</h1>
-                    <p>Adobe Acrobat style editace, OCR a maskování</p>
+                    <h1>PDFpro</h1>
+                    <p>Editace, OCR a export do PDF/SVG/DOCX</p>
                 </div>
             </div>
             
             <div class="header-actions">
                 <label class="btn btn-primary" id="upload-btn">
-                    <span>Nahrát PDF</span>
-                    <input type="file" id="pdf-upload" accept="application/pdf" hidden>
+                    <span>Nahrát (PDF/IMG)</span>
+                    <input type="file" id="pdf-upload" accept="application/pdf,image/png,image/jpeg" hidden>
                 </label>
                 <button id="export-btn" class="btn btn-success" style="display: none;">
-                    💾 Exportovat a Uložit
+                    💾 Uložit PDF
+                </button>
+                <button id="export-svg-btn" class="btn btn-primary" style="display: none;">
+                    🎨 Uložit SVG
+                </button>
+                <button id="export-docx-btn" class="btn btn-primary" style="display: none;">
+                    📝 Uložit DOCX
                 </button>
             </div>
         </header>
@@ -49,15 +57,41 @@
         </div>
 
         <div class="main-layout">
+            <!-- Panel miniatur (Thumbnails) -->
+            <aside id="thumbnails-panel" class="thumbnails-panel hidden">
+                <div class="thumbnails-header">
+                    <h3>Stránky</h3>
+                </div>
+                <div id="thumbnails-container" class="thumbnails-container"></div>
+                <div class="thumbnails-actions">
+                    <label class="btn btn-primary w-full" style="cursor:pointer; font-size: 0.8rem;">
+                        ➕ Přidat (PDF/IMG)
+                        <input type="file" id="merge-upload" accept="application/pdf,image/png,image/jpeg" hidden>
+                    </label>
+                    <div style="display:flex; gap:5px; margin-top:5px;">
+                        <button id="page-dup-btn" class="btn btn-primary" style="flex:1; font-size:0.8rem; padding:4px;" title="Duplikovat vybranou">📄 Dup</button>
+                        <button id="page-rot-btn" class="btn btn-primary" style="flex:1; font-size:0.8rem; padding:4px;" title="Otočit o 90°">🔄 Rot</button>
+                        <button id="page-del-btn" class="btn btn-danger" style="flex:1; font-size:0.8rem; padding:4px;" title="Smazat vybranou">🗑️ Del</button>
+                    </div>
+                    <div style="display:flex; gap:2px; margin-top:5px; align-items:center; background: #e2e8f0; padding: 4px; border-radius: 6px;">
+                        <button id="page-up-btn" class="btn btn-primary" style="padding:2px 6px; font-size:0.8rem;" title="Posunout výš">⬆️</button>
+                        <button id="page-down-btn" class="btn btn-primary" style="padding:2px 6px; font-size:0.8rem;" title="Posunout níž">⬇️</button>
+                        <span style="font-size:0.7rem; margin-left:auto; color: var(--text-muted);">Za st:</span>
+                        <input type="number" id="page-move-input" style="width: 35px; padding: 2px; font-size:0.75rem; border:1px solid #ccc; border-radius:3px;" min="1">
+                        <button id="page-move-btn" class="btn btn-primary" style="padding:2px 6px; font-size:0.8rem;" title="Přesunout za">➤</button>
+                    </div>
+                </div>
+            </aside>
+
             <!-- Nástrojová lišta (Toolbar) -->
             <aside id="toolbar" class="toolbar hidden">
                 <div class="toolbar-section">
                     <h3>Nástroje</h3>
-                    <button class="tool-btn active" data-mode="select" title="Vybrat a upravit objekty">
-                        👆 Výběr
+                    <button class="tool-btn active" data-mode="select" title="Vybrat a upravit objekty (lze i tažením pro OCR)">
+                        👆 Výběr / Přesun
                     </button>
                     <button class="tool-btn" data-mode="ocr" title="Vybere oblast a převede zapečený text na upravitelný">
-                        🔍 OCR Text
+                        🔍 Výběr pro OCR
                     </button>
                     <button class="tool-btn" data-mode="text" title="Přidá na stránku vlastní statický (zapečený) text">
                         🔤 Nový Text
@@ -68,6 +102,13 @@
                     <button class="tool-btn" data-mode="erase" title="Překryje nechtěný obsah bílým obdélníkem">
                         🧹 Maskovat
                     </button>
+                    <button class="tool-btn" data-mode="image" title="Vložit obrázek nebo razítko">
+                        🖼️ Obrázek
+                    </button>
+                    <button class="tool-btn" data-mode="crop" title="Vybere oblast v PDF a převede ji na vnitřní obrázek">
+                        ✂️ Výřez
+                    </button>
+                    <input type="file" id="image-upload" accept="image/png,image/jpeg" hidden>
                 </div>
                 
                 <!-- Panel vlastností (Properties) -->
@@ -109,7 +150,13 @@
                                 <option value="OpenSans-Medium">Open Sans Medium</option>
                                 <option value="OpenSans-Bold">Open Sans Bold</option>
                             </optgroup>
+                            <optgroup label="Vlastní Fonty" id="custom-fonts-group">
+                            </optgroup>
                         </select>
+                        <label class="btn btn-primary mt-1 w-full" style="cursor:pointer; font-size: 0.8rem; padding: 4px;">
+                            Nahrát font (.ttf/.otf)
+                            <input type="file" id="font-upload" accept=".ttf,.otf" hidden>
+                        </label>
                     </div>
                     <div class="prop-group">
                         <label>Velikost</label>
@@ -138,6 +185,23 @@
                             <input type="checkbox" id="prop-bg-transparent" disabled> Průhledné
                         </label>
                     </div>
+                    <div class="prop-group">
+                        <label class="checkbox-label" title="Při exportu do DOCX se blok zapeče do pozadí obrázku">
+                            <input type="checkbox" id="prop-locked" disabled> 🔒 Uzamknout (pro DOCX)
+                        </label>
+                    </div>
+                    
+                    <div class="prop-group" id="vectorize-options" style="display:none; margin-top: 15px;">
+                        <label>Režim vektorizace</label>
+                        <select id="vectorize-preset" class="text-input" style="padding: 4px; font-size: 0.85rem; width: 100%;">
+                            <option value="logo" selected>Jednoduché logo / Tvary (Ostré, 4 barvy)</option>
+                            <option value="default">Grafika (Střední, 16 barev)</option>
+                            <option value="bw">Černobílé (Skica / Text)</option>
+                            <option value="detailed">Detailní (Vyhlazené, více barev)</option>
+                        </select>
+                        <button id="vectorize-btn" class="btn btn-primary mt-2 w-full" style="background-color: #8b5cf6;" title="Převede obrázek na vektorový SVG objekt">✨ Vektorizovat</button>
+                    </div>
+                    
                     <button id="delete-block-btn" class="btn btn-danger mt-3 w-full" style="display:none;">Odstranit</button>
                 </div>
             </aside>

@@ -1,8 +1,8 @@
 {
-  "name": "PDF Extraktor",
-  "short_name": "PDFExt",
-  "description": "Inteligentní úprava a OCR PDF dokumentů",
-  "start_url": "index.html",
+  "name": "PDFpro",
+  "short_name": "PDFpro",
+  "description": "Inteligentní úprava, vektorizace a OCR PDF dokumentů",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#2563eb",
