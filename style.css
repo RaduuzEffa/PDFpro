@@ -421,6 +421,10 @@ canvas {
     .main-layout {
         flex-direction: column;
     }
+    .sidebar-wrapper {
+        flex-direction: column;
+        width: 100%;
+    }
     .toolbar {
         width: 100%;
     }
@@ -449,8 +453,6 @@ canvas {
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    height: 80vh;
-    min-height: 600px;
 }
 
 .thumbnails-panel.hidden { display: none; }
