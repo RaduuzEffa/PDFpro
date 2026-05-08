@@ -96,6 +96,16 @@ const prevPageBtn = document.getElementById('prev-page');
 const nextPageBtn = document.getElementById('next-page');
 const pageInfo = document.getElementById('page-info');
 
+// Resize Observer to match left sidebar height with right toolbar
+const sidebarObserver = new ResizeObserver(() => {
+    if (window.innerWidth > 900) {
+        thumbnailsPanel.style.height = toolbar.offsetHeight + 'px';
+    } else {
+        thumbnailsPanel.style.height = 'auto';
+    }
+});
+sidebarObserver.observe(toolbar);
+
 // Vlastnosti UI
 const propFont = document.getElementById('prop-font');
 const propSize = document.getElementById('prop-size');
