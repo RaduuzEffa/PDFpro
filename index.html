@@ -63,23 +63,27 @@
                     <h3>Stránky</h3>
                 </div>
                 <div id="thumbnails-container" class="thumbnails-container"></div>
-                <div class="thumbnails-actions">
-                    <label class="btn btn-primary w-full" style="cursor:pointer; font-size: 0.8rem;">
-                        ➕ Přidat (PDF/IMG)
+                <div class="thumbnails-actions" style="display: flex; flex-direction: column; gap: 8px;">
+                    <label class="btn sidebar-action-btn primary-action">
+                        ➕ Přidat stránky (PDF/IMG)
                         <input type="file" id="merge-upload" accept="application/pdf,image/png,image/jpeg" hidden>
                     </label>
-                    <div style="display:flex; gap:5px; margin-top:5px;">
-                        <button id="page-dup-btn" class="btn btn-primary" style="flex:1; font-size:0.8rem; padding:4px;" title="Duplikovat vybranou">📄 Dup</button>
-                        <button id="page-rot-btn" class="btn btn-primary" style="flex:1; font-size:0.8rem; padding:4px;" title="Otočit o 90°">🔄 Rot</button>
-                        <button id="page-del-btn" class="btn btn-danger" style="flex:1; font-size:0.8rem; padding:4px;" title="Smazat vybranou">🗑️ Del</button>
+                    <button id="page-dup-btn" class="btn sidebar-action-btn">📄 Duplikovat stránku</button>
+                    <button id="page-rot-btn" class="btn sidebar-action-btn">🔄 Otočit o 90°</button>
+                    
+                    <div class="move-controls">
+                        <div class="move-arrows">
+                            <button id="page-up-btn" class="btn sidebar-action-btn mini-btn" title="Posunout výš">⬆️</button>
+                            <button id="page-down-btn" class="btn sidebar-action-btn mini-btn" title="Posunout níž">⬇️</button>
+                        </div>
+                        <div class="move-exact">
+                            <span>Za stranu:</span>
+                            <input type="number" id="page-move-input" min="1">
+                            <button id="page-move-btn" class="btn sidebar-action-btn mini-btn">➤</button>
+                        </div>
                     </div>
-                    <div style="display:flex; gap:2px; margin-top:5px; align-items:center; background: #e2e8f0; padding: 4px; border-radius: 6px;">
-                        <button id="page-up-btn" class="btn btn-primary" style="padding:2px 6px; font-size:0.8rem;" title="Posunout výš">⬆️</button>
-                        <button id="page-down-btn" class="btn btn-primary" style="padding:2px 6px; font-size:0.8rem;" title="Posunout níž">⬇️</button>
-                        <span style="font-size:0.7rem; margin-left:auto; color: var(--text-muted);">Za st:</span>
-                        <input type="number" id="page-move-input" style="width: 35px; padding: 2px; font-size:0.75rem; border:1px solid #ccc; border-radius:3px;" min="1">
-                        <button id="page-move-btn" class="btn btn-primary" style="padding:2px 6px; font-size:0.8rem;" title="Přesunout za">➤</button>
-                    </div>
+                    
+                    <button id="page-del-btn" class="btn sidebar-action-btn danger-action">🗑️ Smazat stránku</button>
                 </div>
             </aside>
 
