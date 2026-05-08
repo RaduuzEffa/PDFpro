@@ -581,8 +581,9 @@ canvas {
 /* Sidebar Buttons Styling */
 .sidebar-action-btn {
     width: 100%;
-    text-align: left;
-    justify-content: flex-start;
+    text-align: center;
+    justify-content: center;
+    white-space: nowrap;
     padding: 8px 12px;
     font-size: 0.85rem;
     background: #f1f5f9;
